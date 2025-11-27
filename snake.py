@@ -59,38 +59,34 @@ def check_collision(snake):
     return False
 
 def main():
-    """Main game loop."""
-    # Initialize snake in the middle of the screen
-    snake = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
-    direction = (1, 0)  # Moving right initially
-    food = generate_food(snake)
-    score = 0
-    game_over = False
+    """Main game loop with restart capability."""
+    running = True
+    while running:
+        # Initialize game state
+        snake = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
+        direction = (1, 0)  # Moving right initially
+        food = generate_food(snake)
+        score = 0
+        game_over = False
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if game_over:
-                    if event.key == pygame.K_r:
-                        main()  # Restart game
-                    if event.key == pygame.K_q:
-                        pygame.quit()
-                        sys.exit()
-                else:
-                    # Change direction (prevent 180-degree turns)
-                    if event.key == pygame.K_UP and direction != (0, 1):
-                        direction = (0, -1)
-                    elif event.key == pygame.K_DOWN and direction != (0, -1):
-                        direction = (0, 1)
-                    elif event.key == pygame.K_LEFT and direction != (1, 0):
-                        direction = (-1, 0)
-                    elif event.key == pygame.K_RIGHT and direction != (-1, 0):
-                        direction = (1, 0)
+        while not game_over:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    game_over = True
+                    continue
+                if event.type == pygame.KEYDOWN:
+                    if not game_over:
+                        # Change direction (prevent 180-degree turns)
+                        if event.key == pygame.K_UP and direction != (0, 1):
+                            direction = (0, -1)
+                        elif event.key == pygame.K_DOWN and direction != (0, -1):
+                            direction = (0, 1)
+                        elif event.key == pygame.K_LEFT and direction != (1, 0):
+                            direction = (-1, 0)
+                        elif event.key == pygame.K_RIGHT and direction != (-1, 0):
+                            direction = (1, 0)
 
-        if not game_over:
             # Move snake
             head = snake[0]
             new_head = (head[0] + direction[0], head[1] + direction[1])
@@ -107,23 +103,42 @@ def main():
             if check_collision(snake):
                 game_over = True
 
-        # Drawing
-        screen.fill(BLACK)
-        draw_grid()
-        draw_snake(snake)
-        draw_food(food)
+            # Drawing
+            screen.fill(BLACK)
+            draw_grid()
+            draw_snake(snake)
+            draw_food(food)
 
-        # Draw score
-        score_text = font.render(f"Score: {score}", True, WHITE)
-        screen.blit(score_text, (10, 10))
+            # Draw score
+            score_text = font.render(f"Score: {score}", True, WHITE)
+            screen.blit(score_text, (10, 10))
 
-        # Draw game over message
-        if game_over:
-            game_over_text = font.render("GAME OVER! Press R to Restart or Q to Quit", True, WHITE)
-            screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 2))
+            pygame.display.flip()
+            clock.tick(FPS)
 
-        pygame.display.flip()
-        clock.tick(FPS)
+            # Handle restart or quit after game over
+            if game_over:
+                game_over_text = font.render("GAME OVER! Press R to Restart or Q to Quit", True, WHITE)
+                screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 2))
+                pygame.display.flip()
+
+                restart = False
+                while game_over and not restart:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            running = False
+                            game_over = True
+                            restart = True
+                        elif event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_r:
+                                restart = True
+                                game_over = False
+                            elif event.key == pygame.K_q:
+                                running = False
+                                game_over = True
+
+    pygame.quit()
+    sys.exit()
 
 if __name__ == "__main__":
     main()
