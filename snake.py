@@ -44,7 +44,25 @@ def draw_food(food):
 
 def generate_food(snake):
     """Generate food at a random position not occupied by the snake."""
-        # Main game initialization
+    while True:
+        food = (random.randint(0, GRID_WIDTH - 1), random.randint(0, GRID_HEIGHT - 1))
+        if food not in snake:
+            return food
+
+def check_collision(snake):
+    """Check if the snake has collided with itself or the walls."""
+    head = snake[0]
+    if head[0] < 0 or head[0] >= GRID_WIDTH or head[1] < 0 or head[1] >= GRID_HEIGHT:
+        return True
+    if head in snake[1:]:
+        return True
+    return False
+
+def main():
+    """Main game loop with restart capability."""
+    running = True
+    while running:
+        # Initialize game state
         snake = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
         direction = (1, 0)  # Moving right initially
         food = generate_food(snake)
@@ -58,23 +76,17 @@ def generate_food(snake):
                     game_over = True
                     continue
                 if event.type == pygame.KEYDOWN:
-                    if game_over:
-                        continue
+                    if not game_over:
                         # Change direction (prevent 180-degree turns)
-                    if event.key == pygame.K_UP and direction != (0, 1):
-                        direction = (0, -1)
-                    elif event.key == pygame.K_DOWN and direction != (0, -1):
-                        direction = (0, 1)
-                    elif event.key == pygame.K_LEFT and direction != (1, 0):
-                        direction = (-1, 0)
-                    elif event.key == pygame.K_RIGHT and direction != (-1, 0):
-                        direction = (1, 0)
-            # Move snake
-            head = snake[0]
-            new_head = (head[0] + direction[0], head[1] + direction[1])
-            snake.insert(0, new_head)
+                        if event.key == pygame.K_UP and direction != (0, 1):
+                            direction = (0, -1)
+                        elif event.key == pygame.K_DOWN and direction != (0, -1):
+                            direction = (0, 1)
+                        elif event.key == pygame.K_LEFT and direction != (1, 0):
+                            direction = (-1, 0)
+                        elif event.key == pygame.K_RIGHT and direction != (-1, 0):
+                            direction = (1, 0)
 
-            # Check if food is eaten
             # Move snake
             head = snake[0]
             new_head = (head[0] + direction[0], head[1] + direction[1])
