@@ -1,4 +1,4 @@
-# snake. 👍
-simple python snake game that i made in an hour or so since i wanted to
+# snake (no litterally it's a simple snake game)
+pretty simple snake game made in python cuz why not
 
-uhhhhhhh was not made by ai and if you wanna try then just run pip install pygame before doing python3 snake.py in the terminal so ye
+originally SLIGHTLY used ai, currently part of my ageground ( https://github.com/vvichar/ageground ) project, so most of the code is probably ai
