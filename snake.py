@@ -63,8 +63,11 @@ def main():
     running = True
     while running:
         # Initialize game state
-        snake = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
+        # Start snake with length 3
+        start_x, start_y = GRID_WIDTH // 2, GRID_HEIGHT // 2
+        snake = [(start_x, start_y), (start_x - 1, start_y), (start_x - 2, start_y)]
         direction = (1, 0)  # Moving right initially
+        last_direction = direction
         food = generate_food(snake)
         score = 0
         game_over = False
@@ -78,16 +81,17 @@ def main():
                 if event.type == pygame.KEYDOWN:
                     if not game_over:
                         # Change direction (prevent 180-degree turns)
-                        if event.key == pygame.K_UP and direction != (0, 1):
+                        if event.key == pygame.K_UP and last_direction != (0, 1):
                             direction = (0, -1)
-                        elif event.key == pygame.K_DOWN and direction != (0, -1):
+                        elif event.key == pygame.K_DOWN and last_direction != (0, -1):
                             direction = (0, 1)
-                        elif event.key == pygame.K_LEFT and direction != (1, 0):
+                        elif event.key == pygame.K_LEFT and last_direction != (1, 0):
                             direction = (-1, 0)
-                        elif event.key == pygame.K_RIGHT and direction != (-1, 0):
+                        elif event.key == pygame.K_RIGHT and last_direction != (-1, 0):
                             direction = (1, 0)
 
             # Move snake
+            last_direction = direction
             head = snake[0]
             new_head = (head[0] + direction[0], head[1] + direction[1])
             snake.insert(0, new_head)
@@ -117,25 +121,24 @@ def main():
             clock.tick(FPS)
 
             # Handle restart or quit after game over
-            if game_over:
+            if game_over and running:
                 game_over_text = font.render("GAME OVER! Press R to Restart or Q to Quit", True, WHITE)
                 screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 2))
                 pygame.display.flip()
 
                 restart = False
-                while game_over and not restart:
+                while not restart:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             running = False
-                            game_over = True
                             restart = True
                         elif event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_r:
                                 restart = True
-                                game_over = False
                             elif event.key == pygame.K_q:
                                 running = False
-                                game_over = True
+                                restart = True
+                    clock.tick(FPS)
 
     pygame.quit()
     sys.exit()
